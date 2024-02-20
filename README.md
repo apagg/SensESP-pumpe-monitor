@@ -1,5 +1,3 @@
-# SensESP Smart Lampe
+# SensESP Pumpe monitor
 
-Lampe som gir hvit sterkt lys på dagen og rødt lys på natten 
-bruker environment.mode for å finne ut om det er natt eller dag
-Kontrolerer WS2812B LED stripe
+Monitoring pumps using ADS1115
