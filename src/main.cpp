@@ -74,7 +74,7 @@ void setup() {
     new SKOutputFloat("electrical.pump.A3","/pump/A3/path"));
 
   const uint8_t kDigitalInput1Pin = 13;
-  const unsigned int kDigitalInput1Interval = 250;
+  const unsigned int kDigitalInput1Interval = 1000;
   
   pinMode(kDigitalInput1Pin, INPUT_PULLDOWN);
   
@@ -82,11 +82,7 @@ void setup() {
       kDigitalInput1Interval,
       [kDigitalInput1Pin]() { return digitalRead(kDigitalInput1Pin); });
 
-  PressRepeater* press_repeater_digital_input1 = new PressRepeater("/digital_input1/PressRepeater",0,10000,10000);
-  digital_input1->connect_to(press_repeater_digital_input1);
-  
-  press_repeater_digital_input1->connect_to(new RepeatReport<bool>(10000, "/digital_input1/RepeatReport"))
-    ->connect_to(new SKOutputBool(
+  digital_input1->connect_to(new SKOutputBool(
       "sensors.digital_input1.value",          // Signal K path
       "/sensors/digital_input1/value",         // configuration path
       new SKMetadata("",                       // No units for boolean values
@@ -96,7 +92,7 @@ void setup() {
   
 
   const uint8_t kDigitalInput2Pin = 14;
-  const unsigned int kDigitalInput2Interval = 250;
+  const unsigned int kDigitalInput2Interval = 1000;
   
   pinMode(kDigitalInput2Pin, INPUT_PULLDOWN);
   
@@ -104,11 +100,8 @@ void setup() {
       kDigitalInput2Interval,
       [kDigitalInput2Pin]() { return digitalRead(kDigitalInput2Pin); });
   
-  PressRepeater* press_repeater_digital_input2 = new PressRepeater("/digital_input2/PressRepeater",0,10000,10000);
-  digital_input2->connect_to(press_repeater_digital_input2);
-
-  press_repeater_digital_input2->connect_to(new RepeatReport<bool>(10000, "/digital_input2/RepeatReport"))
-    ->connect_to(new SKOutputBool(
+  
+  digital_input2->connect_to(new SKOutputBool(
       "sensors.digital_input2.value",          // Signal K path
       "/sensors/digital_input2/value",         // configuration path
       new SKMetadata("",                       // No units for boolean values
