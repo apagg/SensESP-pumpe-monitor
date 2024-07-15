@@ -12,6 +12,7 @@
 #include "sensesp/sensors/digital_input.h"
 #include "sensesp/transforms/press_repeater.h"
 #include "sensesp/transforms/repeat_report.h"
+#include "sensesp/transforms/frequency.h"
 
 
 Adafruit_ADS1115 ads;
@@ -42,6 +43,7 @@ void setup() {
                     // settings. This is normally not needed.
                     //->set_wifi("My WiFi SSID", "my_wifi_password")
                     //->set_sk_server("192.168.10.3", 80)
+                    ->enable_ota("OTAord")
                     ->get_app();
    
   // Start ADS1X15
@@ -108,7 +110,41 @@ void setup() {
                      "Digital input 2 value")  // Value description
       ));    
   
+/// RPM start
   
+  const char* rpm_sk_path = "propulsion.main.revolutions";
+  const char* rpm_config_path = "/sensors/engine_rpm";
+  const char* rpm_config_path_calibrate = "/sensors/engine_rpm/calibrate";
+  const char* rpm_config_path_skpath = "/sensors/engine_rpm/sk";
+
+  //////////
+  // connect a RPM meter. A DigitalInputCounter implements an interrupt
+  // to count pulses and reports the readings every rpm_read_delay ms
+  // (500 in the example). A Frequency
+  // transform takes a number of pulses and converts that into
+  // a frequency. The sample rpm_multiplier converts the 97 tooth
+  // tach output into Hz, SK native units.
+  const float rpm_multiplier = 1.0 / 6.0;
+  const unsigned int rpm_read_delay = 500;
+
+  // Wire it all up by connecting the producer directly to the consumer
+  // ESP32 pins are specified as just the X in GPIOX
+  uint8_t pin = 25;
+
+  auto* sensor = new DigitalInputCounter(pin, INPUT_PULLUP, RISING, rpm_read_delay);
+
+  sensor
+      ->connect_to(new Frequency(
+          rpm_multiplier, rpm_config_path_calibrate))  // connect the output of sensor
+                                               // to the input of Frequency()
+      ->connect_to(new SKOutputFloat(
+          rpm_sk_path, rpm_config_path_skpath));  // connect the output of Frequency()
+                                          // to a Signal K Output as a number
+
+  // Start the SensESP application running. Because of everything that's been
+  // set up above, it constantly monitors the interrupt pin, and every
+  // rpm_read_delay ms, it sends the calculated frequency to Signal K.
+/// RPM end
   
   sensesp_app->start();
 }
